@@ -51,7 +51,7 @@ always@(posedge clk)begin
         X_plus_mul <= 27'b0;
         result_reduce <= 15'b0;
     end
-    else if(valid_delay_reg[2])begin
+    else if(en || valid_delay_reg[2])begin
         m <= X * N_prime;
         m_mul_N <= m * N;
         X_plus_mul <= X_delay_2 + m_mul_N;

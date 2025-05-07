@@ -9,67 +9,66 @@
 |  迭代加法法  | 12-32位  |   N周期   |    低    |  资源敏感型设计   |
 | 混合位宽分解 | 16-64位  |  4-8周期  |    中    |  平衡速度与面积   |
 
-## 直接乘法取模
+## 蒙哥马利算法
 
-直接在代码中使用%号取模，由编译器进行优化。这样的方法被禁止使用。
+蒙哥马利算法是一种高效计算模乘 (*A*×*B*)mod*N* 的算法，**核心思想是通过数值域转换和移位操作，避免传统模运算中的高成本除法**。它在密码学（如RSA、ECC）和大数运算中广泛应用，尤其适合硬件实现。
 
-## 蒙哥马利乘法
+### 1.蒙哥马利算法原理
 
-蒙哥马利乘法是一种高效计算模乘 (*A*×*B*)mod*N* 的算法，**核心思想是通过数值域转换和移位操作，避免传统模运算中的高成本除法**。它在密码学（如RSA、ECC）和大数运算中广泛应用，尤其适合硬件实现。
+蒙哥马利算法主要分为蒙哥马利乘法和蒙哥马利约简。算法的流程如下：
 
-###  **1.核心优势**
+#### 1.1 寻找满足条件的R
 
-- **避免除法**：通过预计算和位操作替代除法，硬件实现更高效。
-- **流水线友好**：多步骤迭代可拆分为流水级，提升吞吐量。
-- **适合大数运算**：时间复杂度为 *O*(*k*)（k为位宽），优于传统 *O*($k^2$)。
+假设输入的数据为a,b，模数为N，则首先找到一个数R，它满足如下条件：
 
-### **2. 数学基础与域转换**
+1. $R = 2^k > N;N < 2^{k+1}$,即R是2的幂次方，且是满足比N大的最小幂次方；
+2. $gcd(R, N) = 1$，即R与N互质。
 
-- **蒙哥马利域定义**：
-  - 选择基数 *R*=2*k*（*k* 是模数 *N* 的位宽，且 *R*>*N*）。
-  - 普通数值 *a* 转换为蒙哥马利域：Mont(*a*)=*a*×*R*mod*N*。
-  - **逆转换**：Mont−1(*a*mont)=*a*mont×*R*−1mod*N*。
-- **域内乘法**：
-  - 若 *A*mont=Mont(*A*)，*B*mont=Mont(*B*)，
-  - 则 *A*mont×*B*mont×*R*−1mod*N*=Mont(*A*×*B*)。
+#### 1.2 将输入数据转换到蒙哥马利域
 
-### **3. 蒙哥马利约减（Montgomery Reduction）**
+定义公式  $a_{mont} = (a \times R) mod N$  为蒙哥马利变换，$a_{mont}$是$a$对应的蒙哥马利域的值。同理，也将b转换到蒙哥马利域得到$b_{mont}$
 
-约减操作将中间乘积转换为蒙哥马利域形式，无需直接计算除法。
+#### 1.3 计算蒙哥马利域乘积
 
-- **输入**：*T*=*A*×*B*（普通乘积，位宽 2*k*）。
-- **目标**：计算 Redc(*T*)=*T*×*R*−1mod*N*。
+计算  $X = a_{mont} \times b_{mont}$  ，定义这个乘积是蒙哥马利域乘积。要理解这样为什么可以计算出它的模，要准备下面的公式推导：
 
-##### **步骤**：
+$(a \times b) mod N = ((a mod N)\times(b mod N)mod N)$，这个公式称为模运算的分配律；
 
-1. **预计算参数**：
-   - 计算 *N*′ 满足 *N*×*N*′≡−1mod*R*。可通过扩展欧几里得算法求解。
-2. **计算中间值**：
-   - *m*=(*T*mod*R*)×*N*′mod*R*
-   - *t*=(*T*+*m*×*N*)/*R*
-3. **结果修正**：
-   - 若 *t*≥*N*，则 *t*=*t*−*N*
-   - 最终 Redc(*T*)=*t*
+根据模的性质可得：$(a mod N) mod N = a mod N$，即连续对同一模数取模，第二次以后的结果是不变的。
 
-##### **数学验证**：
+$X = a_{mont} \times b_{mont} = ((a \times R) mod N) \times ((b \times R) mod N) = (abR^2)modN$
 
-- *T*+*m*×*N*≡*T*+(*T*mod*R*)×*N*′×*N*≡0mod*R*，因此除以 *R* 是整数除法。
-- *t*×*R*≡*T*mod*N*，即 *t*=*T*×*R*−1mod*N*。
+因此只要从$X$中约简掉一个R即可得到原式的蒙哥马利域结果$(a \times b)Rmod N$。
 
-### **4. 蒙哥马利乘法完整流程**
+#### 1.4 蒙哥马利约简
 
-以计算 *A*×*B*mod*N* 为例：
+蒙哥马利约简的过程就是从X中除掉R的过程，但大数除法会消耗很多的资源，因此通过以下的算法计算。
 
-1. **预处理**：
-   - 转换输入到蒙哥马利域：*A*mont=Mont(*A*)=(*A*×*R*)mod*N**B*mont=Mont(*B*)=(*B*×*R*)mod*N*
-2. **域内乘法**：
-   - 计算 *T*=*A*mont×*B*mont
-3. **约减操作**：
-   - 应用蒙哥马利约减：*t*=Redc(*T*)=(*A*×*B*)×*R*mod*N*
-4. **逆转换**（若需普通结果）：
-   - 再次约减：Redc(*t*)=(*A*×*B*)mod*N*
+由于$R = 2^k$，$\frac{X}{R} = X >> k$。
 
-### 5.python实现
+但满足这个等式的条件是：X是R的整数倍。实际上不可能总是满足这个条件，但可以构造出来一个新的$X' = j * R$，j是非0正整数。
+
+因此需要找到一个$m$，使得$X + mN = j * R$。
+
+于是问题转换为了求解一个m，满足上面的式子。引入拓展欧几里得算法，求解以下贝祖方程：
+
+$N*N' + R*R^{-1} = 1$
+
+通过迭代算法，可以求得$N'$和$R^{-1}$，这个值计算出来之后就可以当作已知值来用。之后，使用如下公式，用$N'$算出$m$：
+
+$m = (X \times N') mod R$
+
+计算出m后，即可得到蒙哥马利约简的结果y：
+
+$y = (X + m * N)/R$，这个值需要与N做一次比较，小于N则直接输出，大于N则减掉一次N。
+
+#### 1.5 计算模值
+
+定义蒙哥马利约简函数为$reduce(X)$，则对蒙哥马利乘积进行一次约简，获得蒙哥马利域的结果，再进行一次约简可获得实数域结果。即：
+
+$result = reduce(reduce(X))$
+
+### 2.python实现
 
 有一些参数是预计算出来的。蒙哥马利约简需要的N'，可以通过拓展欧几里得算法求解贝祖方程预先得到，它只取决于模数N和选取的R。
 
@@ -253,6 +252,19 @@ always@(posedge clk)begin
     end
 end
 
+reg  [3:0]   valid_delay_reg;  
+
+always @(posedge clk)begin	
+    if(!rst_n)
+        valid_delay_reg <= 4'd0;
+    else if(en == 1'b1)
+        valid_delay_reg <= {valid_delay_reg[2:0],en};
+    else
+        valid_delay_reg <= {valid_delay_reg[2:0],1'b0};
+end
+
+assign valid = valid_delay_reg[3];  
+
 reg     [11:0]      m               ;
 reg     [23:0]      m_mul_N         ;
 reg     [26:0]      X_plus_mul      ;
@@ -265,30 +277,310 @@ always@(posedge clk)begin
         X_plus_mul <= 27'b0;
         result_reduce <= 15'b0;
     end
-    else if(en)begin
+    else if(en || valid_delay_reg[2])begin
         m <= X * N_prime;
         m_mul_N <= m * N;
         X_plus_mul <= X_delay_2 + m_mul_N;
-        result_reduce <= X_plus_mul >> 12;
+        result_reduce <= X_plus_mul >> R;
     end
 end
 
-reg  [3:0]   valid_delay_reg ;     //存放脉冲在传输过程的临时数据  
-
-always @(posedge clk)begin	
-    if(!rst_n)
-        valid_delay_reg <= 4'd0;
-    else if(en == 1'b1)//脉冲输入信号到来
-        valid_delay_reg <= {valid_delay_reg[2:0],en};
-    else
-        valid_delay_reg <= {valid_delay_reg[2:0],1'b0};       //每隔一个时钟周期，前移一位
-end
-
-assign valid = valid_delay_reg[3] ;        //间隔数个周期后，从高位输出   
 assign y = (result_reduce < N) ? result_reduce : result_reduce - N;
 ```
 
 ### montgomery_multiply
 
 经过以上的分析与计算，我们能够确认端口输入输出信号：
+
+```verilog
+module montgomery_multiply #(
+    parameter [11:0]    N = 3329        ,
+    parameter [12:0]    R = 12          ,
+    parameter [12:0]    N_prime = 3327  ,
+    parameter [12:0]    R_sq_modN = 2385
+)
+(
+    input                   clk     ,
+    input                   rst_n   ,
+    input                   en      ,
+    input    [11:0]         a       ,
+    input    [11:0]         b       ,
+    output   [11:0]         result  ,
+    output                  valid
+);
+```
+
+同时计算$a_{mont}$和$b_{mont}$，之后依次计算两次约简结果：
+
+```verilog
+reg     [23:0]              A1;
+reg     [23:0]              B1;
+wire    [14:0]              a_mont;
+wire    [14:0]              b_mont;
+wire                        a_mont_valid;
+wire                        b_mont_valid;
+
+reg  [3:0]   en_delay_reg ;
+wire         en_delay_1;
+
+always @(posedge clk)begin	
+    if(!rst_n)
+        en_delay_reg <= 4'd0;
+    else if(en == 1'b1)
+        en_delay_reg <= {en_delay_reg[2:0],en};
+    else
+        en_delay_reg <= {en_delay_reg[2:0],1'b0};
+end
+
+assign en_delay_1 = en_delay_reg[0] ;
+
+always@(posedge clk)begin
+    if(!rst_n)begin
+        A1 <= 24'b0;
+        B1 <= 24'b0;
+    end
+    else if(en)begin
+        A1 <= a * R_sq_modN;
+        B1 <= b * R_sq_modN;
+    end
+end
+
+montgomery_reduce #(
+    .N          (N),
+    .R          (R),
+    .N_prime    (N_prime)
+)
+montgomery_reduce_A1
+(
+    .clk     (clk           ),
+    .rst_n   (rst_n         ),
+    .en      (en_delay_1    ),
+    .X       ({2'b0, A1}    ), 
+    .y       (a_mont        ),
+    .valid   (a_mont_valid  )
+);
+
+montgomery_reduce #(
+    .N          (N),
+    .R          (R),
+    .N_prime    (N_prime)
+)
+montgomery_reduce_B1
+(
+    .clk     (clk           ),
+    .rst_n   (rst_n         ),
+    .en      (en_delay_1    ),
+    .X       ({2'b0, B1}    ), 
+    .y       (b_mont        ),
+    .valid   (b_mont_valid  )
+);
+
+reg         [25:0]      X_mul_ab;
+reg                     X_mul_ab_valid;
+
+always@(posedge clk)begin
+    if(!rst_n)begin 
+        X_mul_ab <= 26'b0;
+        X_mul_ab_valid <= 1'b0;
+    end
+    else if(a_mont_valid & b_mont_valid)begin
+        X_mul_ab <= a_mont * b_mont;
+        X_mul_ab_valid <= a_mont_valid && b_mont_valid;
+    end
+    else begin 
+        X_mul_ab_valid <= a_mont_valid && b_mont_valid;
+    end
+end
+
+wire     [14:0]     X_out;
+wire                X_out_valid;
+
+montgomery_reduce #(
+    .N          (N),
+    .R          (R),
+    .N_prime    (N_prime)
+)
+montgomery_reduce_X
+(
+    .clk     (clk           ),
+    .rst_n   (rst_n         ),
+    .en      (X_mul_ab_valid),
+    .X       (X_mul_ab      ), 
+    .y       (X_out         ),
+    .valid   (X_out_valid   )
+);
+
+wire     [14:0]     X1_out;
+wire                X1_out_valid;
+
+montgomery_reduce #(
+    .N          (N),
+    .R          (R),
+    .N_prime    (N_prime)
+)
+montgomery_reduce_X1
+(
+    .clk     (clk           ),
+    .rst_n   (rst_n         ),
+    .en      (X_out_valid   ),
+    .X       ({11'b0, X_out}), 
+    .y       (X1_out        ),
+    .valid   (X1_out_valid  )
+);
+
+assign result = X1_out;
+assign valid = X1_out_valid;
+```
+
+### 顶层模块
+
+顶层模块中主要是例化以下乘法模块：
+
+```verilog
+module montgomery_top#(
+    parameter [11:0]    N = 3329        ,
+    parameter [12:0]    R = 12          ,
+    parameter [12:0]    N_prime = 3327  ,
+    parameter [12:0]    R_sq_modN = 2385
+)
+(
+    input           clk     ,
+    input           rst_n   ,
+    input           en      ,
+    input   [11:0]  a       ,
+    input   [11:0]  b       ,
+    output          busy    ,
+    output          done    ,
+    output  [11:0]  r       
+);
+
+montgomery_multiply #(
+    .N          (N          ),
+    .R          (R          ),
+    .N_prime    (N_prime    ),
+    .R_sq_modN  (R_sq_modN  )
+)
+u_montgomery_multiply
+(
+    .clk     (clk       ),
+    .rst_n   (rst_n     ),
+    .en      (en        ),
+    .a       (a         ),
+    .b       (b         ),
+    .result  (r         ),
+    .valid   (done      )
+);
+
+assign busy = en || done;
+
+endmodule
+```
+
+### testbench
+
+```
+`timescale 1ns / 1ps
+
+module montgomery_tb();
+
+parameter A_ADDR = "C:/Users/Jonemaster/Desktop/montgomery/data/a.hex";
+parameter B_ADDR = "C:/Users/Jonemaster/Desktop/montgomery/data/b.hex";
+parameter R_ADDR = "C:/Users/Jonemaster/Desktop/montgomery/data/r.hex";
+
+reg                     clk                 ;
+reg                     rst_n               ;
+
+reg                     en      ;
+reg     [11:0]          a       ;
+reg     [11:0]          b       ;
+wire                    busy    ;
+wire                    done    ;
+wire    [11:0]          r       ;
+
+montgomery_top montgomery_top_test
+(
+    .clk     (clk           ),
+    .rst_n   (rst_n         ),
+    .en      (en            ),
+    .a       (a             ),
+    .b       (b             ),
+    .busy    (busy          ),
+    .done    (done          ),
+    .r       (r             )
+);
+
+reg     [11:0]   a_data [511:0];
+reg     [11:0]   b_data [511:0];
+reg     [11:0]   r_data [511:0];
+
+initial begin
+    $readmemh(A_ADDR, a_data);
+    $readmemh(B_ADDR, b_data);
+    $readmemh(R_ADDR, r_data);
+end
+
+always #10 clk = ~clk;
+
+initial begin
+    clk = 0;
+    rst_n = 0;
+    repeat(2) @(posedge clk);
+    rst_n = 1;
+end
+
+reg     [9:0]   count;
+reg     [9:0]   count_1;
+
+always @ (posedge clk)begin 
+    if(!rst_n)begin  
+        en <= 1'b0;
+        a <= 12'b0;
+        b <= 12'b0;
+        count <= 10'b0;
+    end
+    else begin
+        if(count == 10'd512)begin
+            en <= 1'b0;
+            a <= 12'b0;
+            b <= 12'b0;
+        end
+        else begin 
+            en <= 1'b1;
+            a <= a_data[count];
+            b <= b_data[count];
+            count <= count + 1'b1;
+        end
+    end
+end
+
+always @ (posedge clk)begin
+    if(!rst_n)begin
+        count_1 <= 10'b0;
+    end
+    else if(done)begin
+        if(count_1 == 10'd511)begin
+            if(r == r_data[count_1])begin
+                $display("Test %d Pass", count_1+1'b1);
+            end
+            else begin
+                $display("Test %d Fail, a=%d, b=%d, r=%d, correct=%d", count_1+1'b1, a_data[count_1], b_data[count_1], r, r_data[count_1]);
+            end
+            $display("Test Finish.");
+            $finish;
+        end
+        else begin
+            count_1 <= count_1 + 1'b1;
+            if(r == r_data[count_1])begin
+                $display("Test %d Pass", count_1+1'b1);
+            end
+            else begin
+                $display("Test %d Fail, a=%d, b=%d, r=%d, correct=%d", count_1+1'b1, a_data[count_1], b_data[count_1], r, r_data[count_1]);
+            end
+        end
+    end
+end
+
+endmodule
+
+```
 

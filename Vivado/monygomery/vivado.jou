@@ -1,0 +1,32 @@
+#-----------------------------------------------------------
+# Vivado v2019.2 (64-bit)
+# SW Build 2708876 on Wed Nov  6 21:40:23 MST 2019
+# IP Build 2700528 on Thu Nov  7 00:09:20 MST 2019
+# Start of session at: Wed May  7 17:43:36 2025
+# Process ID: 10816
+# Current directory: C:/Users/Jonemaster/Desktop/montgomery/Vivado/monygomery
+# Command line: vivado.exe -gui_launcher_event rodinguilauncherevent5408 C:\Users\Jonemaster\Desktop\montgomery\Vivado\monygomery\monygomery.xpr
+# Log file: C:/Users/Jonemaster/Desktop/montgomery/Vivado/monygomery/vivado.log
+# Journal file: C:/Users/Jonemaster/Desktop/montgomery/Vivado/monygomery\vivado.jou
+#-----------------------------------------------------------
+start_gui
+open_project C:/Users/Jonemaster/Desktop/montgomery/Vivado/monygomery/monygomery.xpr
+update_compile_order -fileset sources_1
+launch_simulation
+source montgomery_tb.tcl
+current_wave_config {Untitled 1}
+add_wave {{/montgomery_tb/montgomery_top_test/u_montgomery_multiply}} 
+relaunch_sim
+run all
+close_sim
+synth_design -rtl -name rtl_1
+reset_run synth_1
+launch_runs synth_1 -jobs 16
+wait_on_run synth_1
+launch_runs impl_1 -jobs 16
+wait_on_run impl_1
+open_run synth_1 -name synth_1
+create_clock -period 10.000 -name clk -waveform {0.000 5.000} [get_ports clk]
+report_timing_summary -delay_type min_max -report_unconstrained -check_timing_verbose -max_paths 10 -input_pins -routable_nets -name timing_1
+set_operating_conditions -grade extended
+report_power -name {power_1}

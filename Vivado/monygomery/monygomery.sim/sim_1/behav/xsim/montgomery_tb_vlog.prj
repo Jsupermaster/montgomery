@@ -1,0 +1,12 @@
+# compile verilog/system verilog design source files
+verilog xil_defaultlib  \
+"../../../../../../rtl/montgomery_multiply.v" \
+"../../../../../../rtl/montgomery_reduce.v" \
+"../../../../../../rtl/montgomery_top.v" \
+"../../../../../../testbench/montgomery_tb.v" \
+
+# compile glbl module
+verilog xil_defaultlib "glbl.v"
+
+# Do not sort compile order
+nosort

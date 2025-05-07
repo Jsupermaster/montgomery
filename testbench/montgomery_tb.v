@@ -2,9 +2,9 @@
 
 module montgomery_tb();
 
-parameter A_ADDR = "C:/Users/15661/Desktop/mul/data/a.hex";
-parameter B_ADDR = "C:/Users/15661/Desktop/mul/data/b.hex";
-parameter R_ADDR = "C:/Users/15661/Desktop/mul/data/r.hex";
+parameter A_ADDR = "C:/Users/Jonemaster/Desktop/montgomery/data/a.hex";
+parameter B_ADDR = "C:/Users/Jonemaster/Desktop/montgomery/data/b.hex";
+parameter R_ADDR = "C:/Users/Jonemaster/Desktop/montgomery/data/r.hex";
 
 reg                     clk                 ;
 reg                     rst_n               ;
