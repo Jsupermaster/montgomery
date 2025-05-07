@@ -1,0 +1,193 @@
+m255
+K4
+z2
+13
+!s112 1.1
+!i10d 8192
+!i10e 25
+!i10f 100
+cModel Technology
+Z0 dC:/Users/15661/Desktop/JLU-CCIC-RV/modelsim
+T_opt
+!s110 1746552410
+VBCLIZa<<M9XEH]Fc2IS_:3
+04 13 4 work montgomery_tb fast 0
+=1-2481c79e6047-681a465a-188-795c
+Z1 o-quiet -auto_acc_if_foreign -work work3 +acc
+n@_opt
+Z2 OL;O;10.4;61
+T_opt1
+!s110 1746546175
+VaAahM8ee[K18G]kj[?m]11
+04 20 4 work montgomery_reduce_tb fast 0
+=1-2481c79e6047-681a2dff-1bb-944c
+R1
+n@_opt1
+R2
+R0
+T_opt2
+!s110 1746549447
+Vj[YYKW1Fi?eVKFzB23B]l1
+04 22 4 work montgomery_multiply_tb fast 0
+=1-2481c79e6047-681a3ac7-10e-8810
+R1
+n@_opt2
+R2
+R0
+vmontgomery_multiply
+Z3 VDg1SIo80bB@j0V0VzS_@n1
+r1
+!s85 0
+31
+!i10b 1
+!s100 ?b`zhU^R2fM<QW1Pe5cR71
+I]FFU^;jPgh=c60OJ0ISBR0
+Z4 dC:/Users/15661/Desktop/mul/modelsim
+w1746550990
+8C:/Users/15661/Desktop/mul/rtl/montgomery_multiply.v
+FC:/Users/15661/Desktop/mul/rtl/montgomery_multiply.v
+L0 1
+Z5 OL;L;10.4;61
+!s108 1746551392.010000
+!s107 C:/Users/15661/Desktop/mul/rtl/montgomery_multiply.v|
+!s90 -reportprogress|300|-work|work3|-vopt|-stats=none|C:/Users/15661/Desktop/mul/rtl/montgomery_multiply.v|
+!i113 0
+Z6 o-work work3 -L mtiAvm -L mtiRnm -L mtiOvm -L mtiUvm -L mtiUPF -L infact
+vmontgomery_multiply_tb
+!s110 1746551392
+!i10b 1
+!s100 1^BZNf?iUgc<XM^23nUcz2
+IdALXHYk0BU=4K7=[d7AO10
+R3
+R4
+w1746548792
+8C:/Users/15661/Desktop/mul/rtl/montgomery_multiply_tb.v
+FC:/Users/15661/Desktop/mul/rtl/montgomery_multiply_tb.v
+L0 3
+R5
+r1
+!s85 0
+31
+!s108 1746551392.147000
+!s107 C:/Users/15661/Desktop/mul/rtl/montgomery_multiply_tb.v|
+!s90 -reportprogress|300|-work|work3|-vopt|-stats=none|C:/Users/15661/Desktop/mul/rtl/montgomery_multiply_tb.v|
+!i113 0
+R6
+vmontgomery_reduce
+R3
+r1
+!s85 0
+31
+!i10b 1
+!s100 9GzSVXSYk0L6n4=@11g^43
+I3HMT7SRI;_GbJXgd7`R2[3
+R4
+w1746552090
+8C:/Users/15661/Desktop/mul/rtl/montgomery_reduce.v
+FC:/Users/15661/Desktop/mul/rtl/montgomery_reduce.v
+L0 1
+R5
+!s108 1746552099.267000
+!s107 C:/Users/15661/Desktop/mul/rtl/montgomery_reduce.v|
+!s90 -reportprogress|300|-work|work3|-vopt|-stats=none|C:/Users/15661/Desktop/mul/rtl/montgomery_reduce.v|
+!i113 0
+R6
+vmontgomery_reduce_tb
+Z7 !s110 1746551391
+!i10b 1
+!s100 PU0<7WHGocdULD]BCe9aM2
+I5zJLO@C_Ah]>zJB779C]M0
+R3
+R4
+w1746548385
+8C:/Users/15661/Desktop/mul/rtl/montgomery_reduce_tb.v
+FC:/Users/15661/Desktop/mul/rtl/montgomery_reduce_tb.v
+L0 3
+R5
+r1
+!s85 0
+31
+!s108 1746551391.875000
+!s107 C:/Users/15661/Desktop/mul/rtl/montgomery_reduce_tb.v|
+!s90 -reportprogress|300|-work|work3|-vopt|-stats=none|C:/Users/15661/Desktop/mul/rtl/montgomery_reduce_tb.v|
+!i113 0
+R6
+vmontgomery_tb
+!s110 1746552406
+!i10b 1
+!s100 9G@HGGg8o?Xioh>j2OcU73
+I]cO?gd5M1d=?VA_BWIXFS0
+R3
+R4
+w1746552396
+8C:/Users/15661/Desktop/mul/rtl/montgomery_tb.v
+FC:/Users/15661/Desktop/mul/rtl/montgomery_tb.v
+L0 3
+R5
+r1
+!s85 0
+31
+!s108 1746552406.069000
+!s107 C:/Users/15661/Desktop/mul/rtl/montgomery_tb.v|
+!s90 -reportprogress|300|-work|work3|-vopt|-stats=none|C:/Users/15661/Desktop/mul/rtl/montgomery_tb.v|
+!i113 0
+R6
+vmontgomery_top
+R3
+r1
+!s85 0
+31
+!i10b 1
+!s100 EfU`bWD7;G4jD2QAK6n]T1
+InRZk1bR95LTTl2I92P5RQ3
+R4
+w1746550650
+8C:/Users/15661/Desktop/mul/rtl/montgomery_top.v
+FC:/Users/15661/Desktop/mul/rtl/montgomery_top.v
+L0 1
+R5
+!s108 1746551392.429000
+!s107 C:/Users/15661/Desktop/mul/rtl/montgomery_top.v|
+!s90 -reportprogress|300|-work|work3|-vopt|-stats=none|C:/Users/15661/Desktop/mul/rtl/montgomery_top.v|
+!i113 0
+R6
+vmul
+R7
+!i10b 1
+!s100 _kizZ7Y[6bnLA24@g<g8g1
+Im4[<>ZfFU9@BEa0C]6`YH1
+R3
+R4
+w1746499982
+8C:/Users/15661/Desktop/mul/rtl/mul.v
+FC:/Users/15661/Desktop/mul/rtl/mul.v
+L0 1
+R5
+r1
+!s85 0
+31
+!s108 1746551391.602000
+!s107 C:/Users/15661/Desktop/mul/rtl/mul.v|
+!s90 -reportprogress|300|-work|work3|-vopt|-stats=none|C:/Users/15661/Desktop/mul/rtl/mul.v|
+!i113 0
+R6
+vmul_tb
+R7
+!i10b 1
+!s100 ADG>Q66eSf7=7?oM<YzZ:0
+IcDC0?b?MQVAJPD^Y69<zc3
+R3
+R4
+w1746550046
+8C:/Users/15661/Desktop/mul/rtl/mul_tb.v
+FC:/Users/15661/Desktop/mul/rtl/mul_tb.v
+L0 3
+R5
+r1
+!s85 0
+31
+!s108 1746551391.466000
+!s107 C:/Users/15661/Desktop/mul/rtl/mul_tb.v|
+!s90 -reportprogress|300|-work|work3|-vopt|-stats=none|C:/Users/15661/Desktop/mul/rtl/mul_tb.v|
+!i113 0
+R6
