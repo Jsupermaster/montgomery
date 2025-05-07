@@ -478,7 +478,7 @@ endmodule
 
 ### testbench
 
-```
+```verilog
 `timescale 1ns / 1ps
 
 module montgomery_tb();
